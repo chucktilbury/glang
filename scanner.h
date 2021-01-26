@@ -4,13 +4,15 @@
 typedef enum {
     NONE_TOKEN = 0,
     ERROR_TOKEN,
+    END_INPUT,
+    END_FILE,
     END_OF_INPUT = 200,
     SYMBOL_TOKEN,
     UNUM_TOKEN,
     INUM_TOKEN,
     FNUM_TOKEN,
     ONUM_TOKEN,
-    QSTRG_TOK,
+    QSTRG_TOKEN,
     SLASH_TOKEN,
     MUL_TOKEN,
     MOD_TOKEN,
@@ -74,13 +76,14 @@ typedef enum {
 } token_t;
 
 #define TOK_TO_STR(t) \
-    (((t)==END_OF_INPUT)? "END OF INPUT": \
+    (((t)==ERROR_TOKEN)? "ERROR": \
+    ((t)==END_OF_INPUT)? "END OF INPUT": \
     ((t)==SYMBOL_TOKEN)? "symbol": \
     ((t)==UNUM_TOKEN)? "unsigned number": \
     ((t)==INUM_TOKEN)? "signed number": \
     ((t)==FNUM_TOKEN)? "float number": \
     ((t)==ONUM_TOKEN)? "octal number": \
-    ((t)==QSTRG_TOK)? "quoted string": \
+    ((t)==QSTRG_TOKEN)? "quoted string": \
     ((t)==SLASH_TOKEN)? "'/'": \
     ((t)==MUL_TOKEN)? "'*'": \
     ((t)==MOD_TOKEN)? "'%'": \

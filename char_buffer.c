@@ -32,6 +32,7 @@ void init_char_buffer(char_buffer_t chbuf) {
     if(buf->buffer != NULL)
         FREE(buf->buffer);
     buf->buffer = MALLOC(buf->capacity);
+    buf->buffer[0] = 0;
 }
 
 char_buffer_t create_char_buffer() {

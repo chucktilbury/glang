@@ -14,8 +14,6 @@
 #include "memory.h"
 #include "char_buffer.h"
 
-#define END_INPUT -1
-
 typedef struct __file_stack {
     char* fname;
     FILE* fp;
@@ -77,7 +75,7 @@ static token_map_t token_map[] = {
     {"uint", UINT_TOKEN},
     {"void", VOID_TOKEN},
     {"while", WHILE_TOKEN},
-    {NULL, NONE_TOKEN},
+    //{NULL, NONE_TOKEN},
 };
 
 #define TOKEN_MAP_SIZE   (sizeof(token_map)/sizeof(token_map_t))
@@ -96,34 +94,30 @@ static void close_file() {
 static int get_char() {
 
     int ch;
-    int finished = 0;
 
-    while(!finished) {
-        if(top != NULL) {
-            ch = fgetc(top->fp);
-            if(ch == '\n') {
-                top->line_no ++;
-                top->col_no = 0;
-                finished ++;
-            }
-            else if(ch == EOF) {
-                close_file();
-            }
-            else {
-                finished ++;
-                top->col_no ++;
-            }
+    if(top != NULL) {
+        ch = fgetc(top->fp);
+        if(ch == EOF) {
+            ch = END_FILE;
         }
         else {
-            ch = END_INPUT;
-            finished ++;
+            top->col_no ++;
         }
+    }
+    else {
+        ch = END_INPUT;
     }
     return ch;
 }
 
 static void unget_char(int ch) {
-    ungetc(ch, top->fp);
+    if(top != NULL) {
+        ungetc(ch, top->fp);
+        if(top->col_no > 1)
+            top->col_no --;
+        else
+            top->col_no = 1;
+    }
 }
 
 static void skip_ws() {
@@ -132,14 +126,28 @@ static void skip_ws() {
 
     while(!finished) {
         ch = get_char();
-        if(!isspace(ch)) {
-            unget_char(ch);
-            finished++;
-        }
-        else if(ch == END_INPUT)
-            finished++;
+        //if(ch != END_FILE) {
+            if(!isspace(ch)) {
+                unget_char(ch);
+                finished++;
+            }
+            else if(ch == '\n') {
+                top->line_no ++;
+                top->col_no = 1;
+            }
+            else if(ch == END_INPUT)
+                finished++;
+        //}
     }
     // next char in input stream is not blank.
+}
+
+// used for the scanner to recover from an error
+static void eat_until_ws() {
+
+    int ch;
+    while(!isspace(ch = get_char()))
+        add_char_buffer(scanner_buffer, ch);
 }
 
 static void get_hex_escape() {
@@ -223,7 +231,7 @@ static void get_decimal_escape() {
 
 // When this is entered, a back-slash has been seen in a dquote string.
 // could have an octal, hex, or character escape.
-static int get_string_esc() {
+static void get_string_esc() {
 
     int ch = get_char();
     switch(ch) {
@@ -243,7 +251,6 @@ static int get_string_esc() {
         case '\'': add_char_buffer(scanner_buffer, '\''); break;
         default: add_char_buffer(scanner_buffer, ch); break;
     }
-    return 0;
 }
 
 // When this is entered, a dquote has been seen. Check to see if the string
@@ -268,37 +275,26 @@ static int get_string_end() {
 static token_t read_dquote() {
 
     int finished = 0;
-    int ch, state = 0; // state 0 is copying the string to the buffer
-    token_t tok = QSTRG_TOK;
+    int ch;
+    token_t tok = QSTRG_TOKEN;
 
     while(!finished) {
         ch = get_char();
-        switch(state) {
-            case 0:     // copying string
-                switch(ch) {
-                    case '\\':
-                        state = 1;
-                        break;
-                    case '\"':
-                        state = 2;
-                        break;
-                    default:
-                        add_char_buffer(scanner_buffer, ch);
-                        break;
-                }
+        switch(ch) {
+            case '\\':
+                get_string_esc();
                 break;
-            case 1:     // seen a backslash
-                state = get_string_esc();
+            case '\"':
+                if(get_string_end())
+                    finished++;
                 break;
-            case 2:     // seen a (") character
-                state = get_string_end();
+            case '\n':
+                fprintf(stderr, "SYNTAX: line breaks are not allowed in a string.\n");
+                eat_until_ws();
+                return ERROR_TOKEN;
                 break;
-            case 3:     // quitting
-                finished ++;
-                break;
-            default:    // should never happen
-                fprintf(stderr, "FATAL ERROR: Internal scanner error: invalid state in read_dquote()\n");
-                exit(1);
+            default:
+                add_char_buffer(scanner_buffer, ch);
                 break;
         }
     }
@@ -314,15 +310,23 @@ static token_t read_squote() {
 
     int finished = 0;
     int ch, state = 0; // state 0 is copying the string to the buffer
-    token_t tok = QSTRG_TOK;
 
     while(!finished) {
         ch = get_char();
+        if(ch == END_INPUT) {
+            fprintf(stderr, "SYNTAX: unterminated string constant\n");
+            return ERROR_TOKEN;
+        }
         switch(state) {
             case 0:     // copying string
                 switch(ch) {
                     case '\'':
                         state = 1;
+                        break;
+                    case '\n':
+                        fprintf(stderr, "SYNTAX: line breaks are not allowed in a string.\n");
+                        eat_until_ws();
+                        return ERROR_TOKEN;
                         break;
                     default:
                         add_char_buffer(scanner_buffer, ch);
@@ -331,16 +335,13 @@ static token_t read_squote() {
                 break;
             case 1:     // seen a (') character
                 skip_ws();
-                int ch = get_char();
+                ch = get_char();
                 if(ch == '\'')
                     state = 0;   // keep copying string
                 else {
                     unget_char(ch);
-                    return 2;   // string has ended
+                    finished++;
                 }
-                break;
-            case 2:     // quitting
-                finished ++;
                 break;
             default:    // should never happen
                 fprintf(stderr, "FATAL ERROR: Internal scanner error: invalid state in read_squote()\n");
@@ -349,7 +350,7 @@ static token_t read_squote() {
         }
     }
 
-    return tok;
+    return QSTRG_TOKEN;
 }
 
 // when this is entered, a (/) has been seen. If the next character is a
@@ -365,12 +366,26 @@ static token_t comment_or_operator() {
     }
     else if(ch == '*') {
         // eat a multi line comment
+        int state = 0;
         while(ch != END_OF_INPUT) {
             ch = get_char();
-            if(ch == '*') {
-                ch = get_char();
-                if(ch == '/')
+            switch(state) {
+                case 0:
+                    if(ch == '*')
+                        state = 1;
+                    //fprintf(stderr, "0");
+                    break;
+                case 1:
+                    if(ch == '/')
+                        state = 2;
+                    else if(ch != '*')
+                        state = 0;
+                    //fprintf(stderr, "1");
+                    break;
+                case 2:
+                    unget_char(ch);
                     return NONE_TOKEN;
+
             }
         }
     }
@@ -423,9 +438,24 @@ static token_t read_float_number() {
     if(ch == 'e' || ch == 'E') {
         add_char_buffer(scanner_buffer, ch);
         ch = get_char();
-        if(ch == '+' || ch == '-')
+        if(ch == '+' || ch == '-') {
             add_char_buffer(scanner_buffer, ch);
+            ch = get_char();
+            if(isdigit(ch)) {
+                add_char_buffer(scanner_buffer, ch);
+            }
+            else {
+                unget_char(ch);
+                fprintf(stderr, "SYNTAX: malformed float number: %s\n", get_char_buffer(scanner_buffer));
+                return ERROR_TOKEN;
+            }
+            while(isdigit(ch = get_char())) {
+                add_char_buffer(scanner_buffer, ch);
+            }
+            unget_char(ch);
+        }
         else if(isdigit(ch)) {
+            add_char_buffer(scanner_buffer, ch);
             while(isdigit(ch = get_char())) {
                 add_char_buffer(scanner_buffer, ch);
             }
@@ -484,6 +514,7 @@ static token_t read_number_top() {
     }
     else { // It's either a dec or a float.
         int finished = 0;
+        add_char_buffer(scanner_buffer, ch);
         while(!finished) {
             ch = get_char();
             if(isdigit(ch))
@@ -671,28 +702,40 @@ token_t get_tok() {
     while(!finished) {
         ch = get_char();
         switch(ch) {
+            case END_FILE:
+                close_file();
+                break;
             case END_INPUT:
                 tok = END_OF_INPUT;
                 finished ++;
                 break;
+            case '\n':
+                top->line_no ++;
+                top->col_no = 1;
+                break;
             case '\"':  // read a double quoted string
                 tok = read_dquote();
-                if(tok != NONE_TOKEN)
-                    finished ++;
+                //skip_ws();
+                //if(tok != NONE_TOKEN)
+                finished ++;
                 break;
             case '\'': // read a single quoted string
                 tok = read_squote();
-                if(tok != NONE_TOKEN)
-                    finished ++;
+                //skip_ws();
+                //if(tok != NONE_TOKEN)
+                finished ++;
                 break;
             case '/': // may have a comment or an operator
                 tok = comment_or_operator();
+                skip_ws();
                 if(tok != NONE_TOKEN)
                     finished ++;
                 // continue if it was a comment
                 break;
             default:
-                if(isdigit(ch)) { // beginning of a number. Could be hex, dec, or float
+                if(ch == END_FILE)
+                    unget_char(ch);
+                else if(isdigit(ch)) { // beginning of a number. Could be hex, dec, or float
                     unget_char(ch);
                     tok = read_number_top();
                     if(tok != NONE_TOKEN)
@@ -710,7 +753,7 @@ token_t get_tok() {
                         finished ++;
                 }
                 else {
-                    fprintf(stderr, "WARNING: Unknown character, ignoring. \'%c\' (0x%02X)\n", ch, ch);
+                    fprintf(stderr, "WARNING: Unknown character, ignoring. \'%c\' (0x%02X) (%d)\n", ch, ch, ch);
                 }
         }
     }
