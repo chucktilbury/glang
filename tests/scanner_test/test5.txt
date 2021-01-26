@@ -1,0 +1,4 @@
+// import the test code
+import "binsrch.g"
+import 'fact.g'
+import 'fibon.g'

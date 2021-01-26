@@ -361,8 +361,12 @@ static token_t comment_or_operator() {
 
     if(ch == '/') {
         // eat a sinlge line comment
-        while('\n' != get_char()) {}
-        return NONE_TOKEN;
+        int finished = 0;
+        while(!finished) {
+            ch = get_char();
+            if(ch == '\n' || ch == END_FILE)
+                return NONE_TOKEN;
+        }
     }
     else if(ch == '*') {
         // eat a multi line comment
@@ -538,8 +542,14 @@ static token_t read_number_top() {
 static token_t read_word() {
 
     int c;
-    while(isalnum(c = get_char())) {
-        add_char_buffer(scanner_buffer, c);
+    int finished = 0;
+
+    while(!finished) {
+        c = get_char();
+        if(isalnum(c) || c == '_')
+            add_char_buffer(scanner_buffer, c);
+        else
+            finished++;
     }
     unget_char(c);
     const char* find = get_char_buffer(scanner_buffer);

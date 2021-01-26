@@ -106,8 +106,8 @@ typedef enum {
     ((t)==EQUALITY_TOKEN)? "'==' or 'equ'": \
     ((t)==LTE_TOKEN)? "'<=' or 'lte'": \
     ((t)==GTE_TOKEN)? "'>=' or 'gte'": \
-    ((t)==DEC_TOKEN)? "'--'": \
-    ((t)==INC_TOKEN)? "'++'": \
+    ((t)==DEC_TOKEN)? "'decrement'": \
+    ((t)==INC_TOKEN)? "'increment'": \
     ((t)==NEQ_TOKEN)? "'!=' or 'neq'": \
     ((t)==AND_TOKEN)? "'&' or 'and'": \
     ((t)==OR_TOKEN)? "'|' or 'or'": \
