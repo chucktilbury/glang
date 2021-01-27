@@ -2,10 +2,7 @@
     This is a simple wrapper around the memory allocation routines to make
     error handling easier. All memory allocation errors are fatal errors.
 */
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
+#include "common.h"
 
 static uint64_t mem_segment;
 #define SEG_MASK 0xFFFF00000000
@@ -22,39 +19,34 @@ void memory_init() {
 void *memory_calloc(size_t num, size_t size) {
 
     void* ptr = calloc(num, size);
-    if(ptr == NULL) {
-        fprintf(stderr, "FATAL ERROR: cannot allocate %lu bytes\n", num*size);
-        exit(1);
-    }
+    if(ptr == NULL)
+        fatal_error("cannot allocate %lu bytes\n", num*size);
+
     return ptr;
 }
 
 void *memory_malloc(size_t size) {
 
     void* ptr = malloc(size);
-    if(ptr == NULL) {
-        fprintf(stderr, "FATAL ERROR: cannot allocate %lu bytes\n", size);
-        exit(1);
-    }
+    if(ptr == NULL)
+        fatal_error("cannot allocate %lu bytes\n", size);
+
     return ptr;
 }
 
 void *memory_realloc(void* ptr, size_t size) {
 
     void* nptr = realloc(ptr, size);
-    if(nptr == NULL) {
-        fprintf(stderr, "FATAL ERROR: cannot reallocate %lu bytes\n", size);
-        exit(1);
-    }
+    if(nptr == NULL)
+        fatal_error("cannot reallocate %lu bytes\n", size);
+
     return nptr;
 }
 
 void memory_free(void* ptr) {
 
-    if(mem_segment != GET_SEG(ptr)) {
-        fprintf(stderr, "ERROR: Attempt to free a pointer that was not allocated: %p\n", ptr);
-        // make this fatal when its finalized
-    }
+    if(mem_segment != GET_SEG(ptr))
+        fatal_error("Attempt to free a pointer that was not allocated: %p\n", ptr);
     else
         free(ptr);
 }
@@ -62,9 +54,8 @@ void memory_free(void* ptr) {
 char* memory_strdup(const char* str) {
 
     char* nptr = strdup(str);
-    if(nptr == NULL) {
-        fprintf(stderr, "FATAL ERROR: cannot strdup %lu bytes\n", strlen(str));
-        exit(1);
-    }
+    if(nptr == NULL)
+        fatal_error("cannot strdup %lu bytes\n", strlen(str));
+
     return nptr;
 }

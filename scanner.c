@@ -3,15 +3,9 @@
 
     This module separates the input text into tokens and then returns the token.
 */
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <ctype.h>
-#include <string.h>
-#include <errno.h>
+#include "common.h"
 
 #include "scanner.h"
-#include "memory.h"
 #include "char_buffer.h"
 
 typedef struct __file_stack {
@@ -165,7 +159,7 @@ static void get_hex_escape() {
     }
 
     if(strlen(tbuf) == 0) {
-        fprintf(stderr, "WARNING: invalid hex escape code in string: '%c' is not a hex digit. Ignored.\n", ch);
+        warning("invalid hex escape code in string: '%c' is not a hex digit. Ignored.\n", ch);
         unget_char(ch);
     }
     else {
@@ -189,7 +183,7 @@ static void get_octal_escape() {
     }
 
     if(strlen(tbuf) == 0) {
-        fprintf(stderr, "WARNING: invalid octal escape code in string: '%c' is not a octal digit. Ignored.\n", ch);
+        warning("invalid octal escape code in string: '%c' is not a octal digit. Ignored.\n", ch);
         unget_char(ch);
     }
     else {
@@ -220,7 +214,7 @@ static void get_decimal_escape() {
     }
 
     if(strlen(tbuf) == 0) {
-        fprintf(stderr, "WARNING: invalid decimal escape code in string: '%c' is not a decimal digit. Ignored.\n", ch);
+        warning("invalid decimal escape code in string: '%c' is not a decimal digit. Ignored.\n", ch);
         unget_char(ch);
     }
     else {
@@ -289,7 +283,7 @@ static token_t read_dquote() {
                     finished++;
                 break;
             case '\n':
-                fprintf(stderr, "SYNTAX: line breaks are not allowed in a string.\n");
+                syntax("line breaks are not allowed in a string.\n");
                 eat_until_ws();
                 return ERROR_TOKEN;
                 break;
@@ -314,7 +308,7 @@ static token_t read_squote() {
     while(!finished) {
         ch = get_char();
         if(ch == END_INPUT) {
-            fprintf(stderr, "SYNTAX: unterminated string constant\n");
+            syntax("unterminated string constant\n");
             return ERROR_TOKEN;
         }
         switch(state) {
@@ -324,7 +318,7 @@ static token_t read_squote() {
                         state = 1;
                         break;
                     case '\n':
-                        fprintf(stderr, "SYNTAX: line breaks are not allowed in a string.\n");
+                        syntax("line breaks are not allowed in a string.\n");
                         eat_until_ws();
                         return ERROR_TOKEN;
                         break;
@@ -344,7 +338,7 @@ static token_t read_squote() {
                 }
                 break;
             default:    // should never happen
-                fprintf(stderr, "FATAL ERROR: Internal scanner error: invalid state in read_squote()\n");
+                fatal_error("Internal scanner error: invalid state in read_squote()\n");
                 exit(1);
                 break;
         }
@@ -423,7 +417,7 @@ static token_t read_octal_number() {
             while(isdigit(ch = get_char()))
                 add_char_buffer(scanner_buffer, ch);
             unget_char(ch);
-            fprintf(stderr, "SYNTAX: malformed octal number: %s\n", get_char_buffer(scanner_buffer));
+            syntax("malformed octal number: %s\n", get_char_buffer(scanner_buffer));
             return ERROR_TOKEN;
         }
     }
@@ -450,7 +444,7 @@ static token_t read_float_number() {
             }
             else {
                 unget_char(ch);
-                fprintf(stderr, "SYNTAX: malformed float number: %s\n", get_char_buffer(scanner_buffer));
+                syntax("malformed float number: %s\n", get_char_buffer(scanner_buffer));
                 return ERROR_TOKEN;
             }
             while(isdigit(ch = get_char())) {
@@ -469,7 +463,7 @@ static token_t read_float_number() {
             while(isdigit(ch = get_char()))
                 add_char_buffer(scanner_buffer, ch);
             unget_char(ch);
-            fprintf(stderr, "SYNTAX: malformed float number: %s\n", get_char_buffer(scanner_buffer));
+            syntax("malformed float number: %s\n", get_char_buffer(scanner_buffer));
             return ERROR_TOKEN;
         }
     }
@@ -507,7 +501,7 @@ static token_t read_number_top() {
                 while(isdigit(ch = get_char()))
                     add_char_buffer(scanner_buffer, ch);
                 unget_char(ch);
-                fprintf(stderr, "SYNTAX: malformed octal number: %s\n", get_char_buffer(scanner_buffer));
+                syntax("malformed octal number: %s\n", get_char_buffer(scanner_buffer));
                 return ERROR_TOKEN;
             }
         }
@@ -665,7 +659,7 @@ static token_t read_punct(int ch) {
 
             // these are not recognized
             default:
-                fprintf(stderr, "WARNING: unrecognized character in input: '%c' (0x%02X). Ignored\n", ch, ch);
+                warning("unrecognized character in input: '%c' (0x%02X). Ignored\n", ch, ch);
                 return NONE_TOKEN;
                 break;
         }
@@ -763,7 +757,7 @@ token_t get_tok() {
                         finished ++;
                 }
                 else {
-                    fprintf(stderr, "WARNING: Unknown character, ignoring. \'%c\' (0x%02X) (%d)\n", ch, ch, ch);
+                    warning("Unknown character, ignoring. \'%c\' (0x%02X) (%d)\n", ch, ch, ch);
                 }
         }
     }
@@ -783,14 +777,17 @@ token_t expect_tok_array(token_t* arr) {
             return token;
     }
 
-    fprintf(stderr, "SYNTAX: expected ");
+    // this is contrived to look like a standard syntax error
+    FILE* fp = get_err_stream();
+    fprintf(fp, "Syntax Error: %s: %d: %d: expected ",
+                get_file_name(), get_line_no(), get_column_no());
     for(int i = 0; arr[i] != NONE_TOKEN; i++) {
-        fprintf(stderr, "%s", token_to_str(arr[i]));
+        fprintf(fp, "%s", token_to_str(arr[i]));
         if(arr[i+1] != NONE_TOKEN)
-            fprintf(stderr, ",");
-        fprintf(stderr, " ");
+            fprintf(fp, ",");
+        fprintf(fp, " ");
     }
-    fprintf(stderr, "but got a %s.\n", token_to_str(token));
+    fprintf(fp, "but got a %s.\n", token_to_str(token));
     return ERROR_TOKEN;
 }
 
@@ -805,7 +802,7 @@ token_t expect_tok(token_t tok) {
 
     token_t token = get_tok();
     if(token != tok) {
-        fprintf(stderr, "SYNTAX: expected a %s but got a %s.\n", token_to_str(tok), token_to_str(token));
+        syntax("expected a %s but got a %s.\n", token_to_str(tok), token_to_str(token));
         return ERROR_TOKEN;
     }
     else
@@ -822,13 +819,13 @@ void open_file(const char* fname) {
 
     nest_depth++;
     if(nest_depth > MAX_FILE_NESTING) {
-        fprintf(stderr, "ERROR: Maximum file nesting depth exceeded.\n");
+        fatal_error("Maximum file nesting depth exceeded.\n");
         exit(1);
     }
 
     FILE* fp = fopen(fname, "r");
     if(fp == NULL) {
-        fprintf(stderr, "ERROR: Cannot open input file: \"%s\": %s\n", fname, strerror(errno));
+        fatal_error("Cannot open input file: \"%s\": %s\n", fname, strerror(errno));
         exit(1);    // TODO: handle this error better than simply making it fatal.
     }
 

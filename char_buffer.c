@@ -2,12 +2,7 @@
     This module implements a generic character buffer that grows as content is
     added to it. It is intended to the transiant storage for strings.
 */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdint.h>
-
-#include "memory.h"
+#include "common.h"
 #include "char_buffer.h"
 
 typedef struct {

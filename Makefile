@@ -10,7 +10,9 @@ TARGET	=	$(BINDIR)glang
 SRCS	=	main.c \
 			scanner.c \
 			memory.c \
-			char_buffer.c
+			char_buffer.c \
+			errors.c \
+			parser.c
 
 #SRCS	:=	$(addprefix $(SRCDIR), $(RSRC))
 
