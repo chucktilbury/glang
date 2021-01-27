@@ -12,11 +12,16 @@ static struct {
 // messages longer than this will be truncated to this length.
 static char msg_buff[132];
 
+static void report() {
+    fprintf(errors.fp, "    errors: %d warnings: %d\n", errors.errors, errors.warnings);
+}
+
 void init_errors(FILE* fp) {
 
     errors.fp = fp;   // If this is NULL, then stderr will be used.
     errors.errors = 0;
     errors.warnings = 0;
+    atexit(report);
 }
 
 void syntax(const char* str, ...) {

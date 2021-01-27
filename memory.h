@@ -9,7 +9,7 @@
 
 #include <stdlib.h>
 
-void memory_init();
+void init_memory();
 void *memory_calloc(size_t, size_t);
 void *memory_malloc(size_t);
 void *memory_realloc(void*, size_t);

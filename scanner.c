@@ -778,6 +778,7 @@ token_t expect_tok_array(token_t* arr) {
     }
 
     // this is contrived to look like a standard syntax error
+    // calling this on an empty input stream will produce a wonky message
     FILE* fp = get_err_stream();
     fprintf(fp, "Syntax Error: %s: %d: %d: expected ",
                 get_file_name(), get_line_no(), get_column_no());

@@ -1,6 +1,8 @@
 #ifndef __ERRORS_H__
 #define __ERRORS_H__
 
+#include <stdio.h>
+
 void init_errors(FILE* fp);
 void syntax(const char* str, ...);
 void warning(const char* str, ...);

@@ -8,7 +8,7 @@ static uint64_t mem_segment;
 #define SEG_MASK 0xFFFF00000000
 #define GET_SEG(p) (((uint64_t)p)&SEG_MASK)
 
-void memory_init() {
+void init_memory() {
 
     // int stackvar;
     void* ptr = malloc(1);

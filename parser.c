@@ -3,3 +3,6 @@
 #include "scanner.h"
 #include "memory.h"
 #include "char_buffer.h"
+
+void init_parser() {}
+
