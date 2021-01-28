@@ -12,7 +12,11 @@ SRCS	=	main.c \
 			memory.c \
 			char_buffer.c \
 			errors.c \
-			parser.c
+			parser.c \
+			method_definition.c \
+			class_definition.c \
+			hashtable.c \
+			symbols.c
 
 #SRCS	:=	$(addprefix $(SRCDIR), $(RSRC))
 

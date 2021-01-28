@@ -25,7 +25,13 @@ typedef struct {
     token_t tok;
 } token_map_t;
 
-// this data structure must be in sorted order.
+/*
+    this data structure must be in sorted order.
+    To update, see the file keywordlist.txt in ./tests
+    1. Add the keywords with the token.
+    2. cat keywordlist.txt | sort
+    3. copy/paste the result here.
+*/
 static token_map_t token_map[] = {
     {"and", AND_TOKEN},
     {"bool", BOOL_TOKEN},
@@ -53,13 +59,16 @@ static token_map_t token_map[] = {
     {"import", IMPORT_TOKEN},
     {"inline", INLINE_TOKEN},
     {"int", INT_TOKEN},
-    {"lte", LTE_TOKEN},
     {"list", LIST_TOKEN},
+    {"lte", LTE_TOKEN},
     {"lt", LT_TOKEN},
     {"map", MAP_TOKEN},
     {"neq", NEQ_TOKEN},
     {"not", NOT_TOKEN},
     {"or", OR_TOKEN},
+    {"private", PRIVATE_TOKEN},
+    {"protected", PROTECTED_TOKEN},
+    {"public", PUBLIC_TOKEN},
     {"raise", RAISE_TOKEN},
     {"string", STRING_TOKEN},
     {"super", SUPER_TOKEN},
@@ -69,7 +78,6 @@ static token_map_t token_map[] = {
     {"uint", UINT_TOKEN},
     {"void", VOID_TOKEN},
     {"while", WHILE_TOKEN},
-    //{NULL, NONE_TOKEN},
 };
 
 #define TOKEN_MAP_SIZE   (sizeof(token_map)/sizeof(token_map_t))
@@ -670,6 +678,8 @@ static token_t read_punct(int ch) {
 // Called by atexit()
 static void destroy_scanner() {
     destroy_char_buffer(scanner_buffer);
+    while(top != NULL)
+        close_file();
 }
 
 /**************************
@@ -816,7 +826,7 @@ token_t expect_tok(token_t tok) {
     left off when a new file was opened. It is encumbent on the caller to make
     sure that open_file is called between tokens.
 */
-void open_file(const char* fname) {
+void open_scanner_file(const char* fname) {
 
     nest_depth++;
     if(nest_depth > MAX_FILE_NESTING) {

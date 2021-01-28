@@ -73,6 +73,9 @@ typedef enum {
     FLOAT_TOKEN,
     STRING_TOKEN,
     INLINE_TOKEN,
+    PUBLIC_TOKEN,
+    PRIVATE_TOKEN,
+    PROTECTED_TOKEN,
 } token_t;
 
 #define TOK_TO_STR(t) \
@@ -143,6 +146,9 @@ typedef enum {
     ((t)==INT_TOKEN)? "'int'": \
     ((t)==FLOAT_TOKEN)? "'float'": \
     ((t)==STRING_TOKEN)? "'string'": \
+    ((t)==PUBLIC_TOKEN)? "'public'": \
+    ((t)==PRIVATE_TOKEN)? "'private'": \
+    ((t)==PROTECTED_TOKEN)? "'protected'": \
     ((t)==INLINE_TOKEN)? "'inline'": "UNKNOWN")
 
 #include <stdint.h>
@@ -155,7 +161,7 @@ void init_scanner();
 token_t get_tok();
 token_t expect_tok_array(token_t*);
 token_t expect_tok(token_t);
-void open_file(const char*);
+void open_scanner_file(const char*);
 const char* get_file_name();
 int get_line_no();
 int get_column_no();

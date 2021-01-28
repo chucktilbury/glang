@@ -100,3 +100,18 @@ void add_char_buffer_int(char_buffer_t chbuf, int val) {
             add_char_buffer(chbuf, (int)strtol(blist[idx], NULL, 16));
     }
 }
+
+// Truncate the string at the index given by placing a zero there and fixing
+// the length. If the index is greater than length, then silently fail. Does
+// not change the capacity.
+void truncate_char_buffer(char_buffer_t chbuf, int index) {
+
+    __chbuf_t* buf = (__chbuf_t*)chbuf;
+}
+
+// Copy the given string to the buffer, starting at the index given. If the buffer
+// needs to grow as a result, then grow it.
+void set_char_buffer_index_str(char_buffer_t chbuf, int index, const char* str) {
+
+    __chbuf_t* buf = (__chbuf_t*)chbuf;
+}
