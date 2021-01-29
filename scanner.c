@@ -70,6 +70,7 @@ static token_map_t token_map[] = {
     {"protected", PROTECTED_TOKEN},
     {"public", PUBLIC_TOKEN},
     {"raise", RAISE_TOKEN},
+    {"return", RETURN_TOKEN},
     {"string", STRING_TOKEN},
     {"super", SUPER_TOKEN},
     {"switch", SWITCH_TOKEN},
@@ -556,22 +557,7 @@ static token_t read_word() {
     unget_char(c);
     const char* find = get_char_buffer(scanner_buffer);
 
-    // simple binary search
-    int start = 0, end = TOKEN_MAP_SIZE - 1;
-    int mid = (start + end) / 2;
-    while(start <= end) {
-        int spot = strcmp(find, token_map[mid].str);
-        if(spot > 0)
-            start = mid + 1;
-        else if(spot < 0)
-            end = mid - 1;
-        else
-            return token_map[mid].tok;
-
-        mid = (start + end) / 2;
-    }
-
-    return SYMBOL_TOKEN;
+    return str_to_token(find);
 }
 
 // When this is entered, a punctuation character has been read. If it's a (_)
@@ -685,6 +671,36 @@ static void destroy_scanner() {
 /**************************
     Interface functions
 */
+
+/*
+    Convert the given keyword string to a token. If it is not a keyword,
+    then SYMBOL_TOKEN is returned. Note that this does not convert non-
+    keywords to a token. Non-keywords cause SYMBOL_TOKEN to be returned
+    as well.
+*/
+token_t str_to_token(const char* str) {
+
+    // simple binary search
+    token_t retv = SYMBOL_TOKEN;
+    int start = 0, end = TOKEN_MAP_SIZE - 1;
+    int mid = (start + end) / 2;
+
+    while(start <= end) {
+        int spot = strcmp(str, token_map[mid].str);
+        if(spot > 0)
+            start = mid + 1;
+        else if(spot < 0)
+            end = mid - 1;
+        else {
+            retv = token_map[mid].tok;
+            break;
+        }
+
+        mid = (start + end) / 2;
+    }
+
+    return retv;
+}
 
 const char* token_to_str(token_t tok) {
 

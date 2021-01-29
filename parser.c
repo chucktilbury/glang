@@ -39,10 +39,7 @@ static void eat_block() {
     }
 }
 
-static void uninit_parser() {
-
-    destroy_symbol_table();
-}
+static void uninit_parser() {}
 
 /*
     Create the data structures and open the initial file.

@@ -107,11 +107,16 @@ void add_char_buffer_int(char_buffer_t chbuf, int val) {
 void truncate_char_buffer(char_buffer_t chbuf, int index) {
 
     __chbuf_t* buf = (__chbuf_t*)chbuf;
+    if((size_t)index < buf->length) {
+        buf->length = index;
+        buf->buffer[index] = 0;
+    }
 }
 
 // Copy the given string to the buffer, starting at the index given. If the buffer
 // needs to grow as a result, then grow it.
 void set_char_buffer_index_str(char_buffer_t chbuf, int index, const char* str) {
 
-    __chbuf_t* buf = (__chbuf_t*)chbuf;
+    truncate_char_buffer(chbuf, index);
+    add_char_buffer_str(chbuf, str);
 }

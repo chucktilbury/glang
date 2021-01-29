@@ -76,6 +76,7 @@ typedef enum {
     PUBLIC_TOKEN,
     PRIVATE_TOKEN,
     PROTECTED_TOKEN,
+    RETURN_TOKEN,
 } token_t;
 
 #define TOK_TO_STR(t) \
@@ -149,6 +150,7 @@ typedef enum {
     ((t)==PUBLIC_TOKEN)? "'public'": \
     ((t)==PRIVATE_TOKEN)? "'private'": \
     ((t)==PROTECTED_TOKEN)? "'protected'": \
+    ((t)==RETURN_TOKEN)? "'return'": \
     ((t)==INLINE_TOKEN)? "'inline'": "UNKNOWN")
 
 #include <stdint.h>
@@ -166,5 +168,6 @@ const char* get_file_name();
 int get_line_no();
 int get_column_no();
 const char* get_tok_str();
+token_t str_to_token(const char*);
 
 #endif

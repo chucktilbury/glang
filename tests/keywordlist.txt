@@ -43,3 +43,4 @@
     {"public", PUBLIC_TOKEN},
     {"private", PRIVATE_TOKEN},
     {"protected", PROTECTED_TOKEN},
+    {"return", RETURN_TOKEN},

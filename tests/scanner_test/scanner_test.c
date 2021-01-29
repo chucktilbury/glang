@@ -3,6 +3,7 @@
 
 #include "../../scanner.h"
 #include "../../memory.h"
+#include "../../errors.h"
 
 static void print_line(token_t t) {
     printf("%s: %d: %d: token: %d %s '%s'\n",
@@ -18,16 +19,16 @@ int main(int argc, char** argv) {
     }
 
     token_t tok;
-    memory_init();
+    init_memory();
     init_scanner();
 
-    open_file(argv[1]);
+    open_scanner_file(argv[1]);
     while(END_OF_INPUT != (tok = get_tok())) {
         print_line(tok);
         if(tok == IMPORT_TOKEN) {
             tok = get_tok();
             print_line(tok);
-            open_file(get_tok_str());
+            open_scanner_file(get_tok_str());
         }
     }
 }

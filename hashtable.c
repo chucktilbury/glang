@@ -77,7 +77,7 @@ static void grow_table(hashtable_t * tab)
         // table must always be an even power of 2 for this to work.
         size_t capacity = tab->capacity << 1;
 
-        _table_entry_t* entries = (_table_entry_t *) calloc(capacity, sizeof(_table_entry_t));
+        _table_entry_t* entries = (_table_entry_t *) CALLOC(capacity, sizeof(_table_entry_t));
 
         // re-add the table entries to the new table.
         if(tab->entries != NULL)
@@ -116,7 +116,7 @@ hashtable_t* create_hash_table(void)
     tab = malloc(sizeof(hashtable_t));
 
     tab->capacity = 0x01 << 3;
-    tab->entries = (_table_entry_t *) calloc(tab->capacity, sizeof(_table_entry_t));
+    tab->entries = (_table_entry_t *) CALLOC(tab->capacity, sizeof(_table_entry_t));
     return (tab);
 }
 
@@ -134,13 +134,13 @@ void destroy_hash_table(hashtable_t * tab)
             for(int i = 0; i < (int)tab->capacity; i++)
             {
                 if(tab->entries[i].data != NULL)
-                    free(tab->entries[i].data);
+                    FREE(tab->entries[i].data);
                 if(tab->entries[i].key != NULL)
-                    free((void *)tab->entries[i].key);
+                    FREE((void *)tab->entries[i].key);
             }
-            free(tab->entries);
+            FREE(tab->entries);
         }
-        free(tab);
+        FREE(tab);
     }
 }
 
@@ -154,7 +154,7 @@ void destroy_hash_table(hashtable_t * tab)
  * @param size -- Size of the data to store in the table.
  * @return int -- Indicate whether the data was sored or not.
  */
-hash_retv_t insert_hash_table(hashtable_t * tab, const char* key, void* data, size_t size)
+hash_retv_t insert_hash(hashtable_t * tab, const char* key, void* data, size_t size)
 {
     grow_table(tab);
 
@@ -163,12 +163,34 @@ hash_retv_t insert_hash_table(hashtable_t * tab, const char* key, void* data, si
 
     if(retv == HASH_NO_ERROR)
     {
-        entry->key = strdup(key);
-        entry->data = malloc(size);
+        entry->key = STRDUP(key);
+        entry->data = MALLOC(size);
         memcpy(entry->data, data, size);
         entry->size = size;
         tab->count++;
     }
+
+    return (retv);
+}
+
+/**
+ * @brief Replace the data that is stored in the hash table.
+ *
+ */
+hash_retv_t replace_hash_data(hashtable_t * tab, const char* key, void* data, size_t size) {
+
+    _table_entry_t* entry = find_slot(tab->entries, tab->capacity, key);
+    int retv = HASH_NO_ERROR;
+
+    if(entry->key != NULL) {
+        if(entry->data != NULL)
+            FREE(entry->data);
+        entry->data = MALLOC(size);
+        memcpy(entry->data, data, size);
+        entry->size = size;
+    }
+    else
+        retv = HASH_NOT_FOUND;
 
     return (retv);
 }
@@ -185,7 +207,7 @@ hash_retv_t insert_hash_table(hashtable_t * tab, const char* key, void* data, si
  * @param size -- Number of bytes to copy for the data.
  * @return int -- Indicate whether there was an error or not.
  */
-hash_retv_t find_hash_table(hashtable_t * tab, const char* key, void* data, size_t size)
+hash_retv_t find_hash(hashtable_t * tab, const char* key, void* data, size_t size)
 {
     _table_entry_t* entry = find_slot(tab->entries, tab->capacity, key);
     int retv = HASH_NO_ERROR;
@@ -199,27 +221,6 @@ hash_retv_t find_hash_table(hashtable_t * tab, const char* key, void* data, size
     }
     else
         retv = HASH_NOT_FOUND;
-
-    return (retv);
-}
-
-/**
- * @brief Return the size of the data that is stored in the hash table. If
- * the entry is not found, then return 0, which is an impossible size.
- *
- * @param tab -- The table to search.
- * @param key -- String used to generate the hash.
- * @return size_t -- Size of the data that is stored for the hash.
- */
-size_t find_hash_table_entry_size(hashtable_t * tab, const char* key)
-{
-    _table_entry_t* entry = find_slot(tab->entries, tab->capacity, key);
-    size_t retv = 0;
-
-    if(entry->key != NULL)
-    {
-        retv = entry->size;
-    }
 
     return (retv);
 }

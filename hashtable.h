@@ -36,9 +36,9 @@ typedef struct {
 
 hashtable_t* create_hash_table(void);
 void destroy_hash_table(hashtable_t*);
-hash_retv_t insert_hash_table(hashtable_t*, const char*, void*, size_t);
-hash_retv_t find_hash_table(hashtable_t*, const char*, void*, size_t);
-size_t find_hash_table_entry_size(hashtable_t*, const char*);
+hash_retv_t insert_hash(hashtable_t*, const char*, void*, size_t);
+hash_retv_t find_hash(hashtable_t*, const char*, void*, size_t);
+hash_retv_t replace_hash_data(hashtable_t*, const char*, void*, size_t);
 const char* iterate_hash_table(hashtable_t*, int);
 
 #endif

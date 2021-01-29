@@ -3,7 +3,8 @@ TARGET	=	scan_test
 SRCS	=	scanner_test.c \
 			../../scanner.c \
 			../../char_buffer.c \
-			../../memory.c
+			../../memory.c \
+			../../errors.c
 
 OBJS	=	$(SRCS:.c=.o)
 
