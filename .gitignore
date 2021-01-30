@@ -1,4 +1,7 @@
-glang
+bin
+lib
+.vscode
+
 # Prerequisites
 *.d
 

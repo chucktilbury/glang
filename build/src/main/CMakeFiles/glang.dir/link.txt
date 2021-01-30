@@ -1,0 +1,1 @@
+/usr/bin/cc    CMakeFiles/glang.dir/main.c.o  -o ../../../bin/glang ../../../lib/libparser.a ../../../lib/libscanner.a ../../../lib/libsymbols.a ../../../lib/libutils.a 

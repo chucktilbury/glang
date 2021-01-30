@@ -31,4 +31,5 @@ int main(int argc, char** argv) {
             open_scanner_file(get_tok_str());
         }
     }
+    print_line(tok);
 }

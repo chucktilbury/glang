@@ -7,8 +7,9 @@ SRCS	=	scanner_test.c \
 			../../errors.c
 
 OBJS	=	$(SRCS:.c=.o)
+CC		= 	gcc
 
-%o: %c
+%.o: %.c
 	$(CC) -g -Wall -Wextra -c $< -o $@
 
 $(TARGET): $(OBJS)

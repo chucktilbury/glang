@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../../../lib/libsymbols.a  CMakeFiles/symbols.dir/symbols.c.o
+/usr/bin/ranlib ../../../lib/libsymbols.a
