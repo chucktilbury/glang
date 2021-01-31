@@ -2,6 +2,10 @@ project(scanner)
 
 add_library(${PROJECT_NAME} STATIC
     scanner.c
+    interface.c
+    numbers.c
+    strings.c
+    symbols.c
 )
 
 target_include_directories(${PROJECT_NAME}

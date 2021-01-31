@@ -5,6 +5,9 @@ add_library(${PROJECT_NAME} STATIC
     char_buffer.c
     hashtable.c
     memory.c
+    configure.c
+    ptr_lists.c
+    files.c
 )
 
 target_include_directories(${PROJECT_NAME}

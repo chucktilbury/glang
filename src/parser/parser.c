@@ -1,19 +1,22 @@
 #include "common.h"
 
 #include "scanner.h"
-#include "memory.h"
 #include "char_buffer.h"
 #include "parser.h"
 #include "symbols.h"
+#include "files.h"
 
 #include "class_definition.h"
 #include "method_definition.h"
 
+
+/*
 // Check the configuration to find the file to be imported.
 static const char* find_import(const char* fname) {
     // place holder for after getting the configuration module built.
     return fname;
 }
+*/
 
 // Open a file for import. Only read the class definitions to acquire
 // the symbols and type information.
@@ -21,8 +24,16 @@ static parse_state_t import_statement() {
 
     token_t tok = expect_tok(QSTRG_TOKEN);
     if(tok == QSTRG_TOKEN) {
-        open_scanner_file(find_import(get_tok_str()));
-        return PARSE_TOP;
+        // fatal error when file cannot be opened
+        open_file(get_tok_str());
+        //const char* tmp = get_tok_str();
+        //const char* fname = find_import_file(tmp);
+        //if(fname != NULL) {
+        //    open_scanner_file(fname);
+        //    return PARSE_TOP;
+        //}
+        //else
+        //    syntax("import could not be found: %s", tmp);
     }
 
     return PARSE_ERROR;
@@ -47,16 +58,10 @@ static void uninit_parser() {}
 /*
     Create the data structures and open the initial file.
 */
-void init_parser(const char* fname) {
+void init_parser() {
 
     // Create the symbol table and ant other data structures.
     init_symbol_table();
-
-    if(fname != NULL) {
-        open_scanner_file(fname);
-    }
-    else
-        command_error("no input file was specified");
 
     atexit(uninit_parser);
 }
@@ -69,11 +74,17 @@ void init_parser(const char* fname) {
     At the top level, only class definitions, method definitions, and import
     statements are
 */
-int parse() {
+int parse(const char* fname) {
 
     int finished = 0;
     token_t tok;
     parse_state_t state = PARSE_TOP;
+
+    if(fname != NULL) {
+        open_scanner_file(fname);
+    }
+    else
+        command_error("no input file was specified");
 
     while(!finished) {
         tok = get_tok();

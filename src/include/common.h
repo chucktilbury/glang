@@ -10,5 +10,6 @@
 
 #include "errors.h"
 #include "memory.h"
+#include "configure.h"
 
 #endif

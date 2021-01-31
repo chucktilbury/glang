@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../../../lib/libutils.a  CMakeFiles/utils.dir/errors.c.o CMakeFiles/utils.dir/char_buffer.c.o CMakeFiles/utils.dir/hashtable.c.o CMakeFiles/utils.dir/memory.c.o
-/usr/bin/ranlib ../../../lib/libutils.a

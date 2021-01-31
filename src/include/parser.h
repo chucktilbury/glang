@@ -8,7 +8,7 @@ typedef enum {
     PARSE_ENDING,
 } parse_state_t;
 
-void init_parser(const char* fname);
-int parse();
+void init_parser();
+int parse(const char* fname);
 
 #endif
