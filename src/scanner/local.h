@@ -90,7 +90,7 @@ extern token_map_t token_map[];
 extern const size_t token_map_size;
 #endif
 
-// defined in interface.c
+// defined in interface.c (see ../include/scanner.h)
 
 // defined in numbers.c
 token_t read_number_top();
@@ -107,7 +107,6 @@ void eat_multi_line();
 // defined in strings.c
 token_t read_dquote();
 token_t read_squote();
-token_t comment_or_operator();
 
 // defined in symbols.c
 token_t read_punct(int ch);

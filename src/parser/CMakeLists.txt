@@ -11,7 +11,7 @@ target_include_directories(${PROJECT_NAME}
         ${PROJECT_SOURCE_DIR}/../include
 )
 
-target_compile_options(${PROJECT_NAME} PRIVATE "-Wall" "-g" "-D_DEBUGGING"
+target_compile_options(${PROJECT_NAME} PRIVATE "-Wall" "-Wextra" "-g" "-D_DEBUGGING"
         "-I/usr/lib/llvm-7/include"
         "-D_GNU_SOURCE"
         "-D__STDC_CONSTANT_MACROS"

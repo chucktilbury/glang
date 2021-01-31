@@ -4,6 +4,32 @@
 #include "char_buffer.h"
 #include "local.h"
 
+// when this is entered, a (/) has been seen. If the next character is a
+// (/) or a (*), then we have a comment, otherwise we have a / operator.
+static token_t comment_or_operator() {
+
+    int ch = get_char();
+
+    if(ch == '/') {
+        // eat a sinlge line comment
+        eat_single_line();
+        return NONE_TOKEN;
+    }
+    else if(ch == '*') {
+        // eat a multi line comment
+        eat_multi_line();
+        return NONE_TOKEN;
+    }
+    else {
+        // not a comment, must be a / single-character operator
+        unget_char(ch);
+        return SLASH_TOKEN;
+    }
+
+    // probably an error for the parser to handle
+    return END_OF_INPUT;
+}
+
 // Called by atexit()
 static void destroy_scanner() {
     destroy_char_buffer(scanner_buffer);

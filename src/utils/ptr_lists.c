@@ -116,7 +116,7 @@ void* get_ptr_list_next(ptr_list_t* list)
 {
     if(list != NULL)
     {
-        if(list->index >= 0 && list->index < list->nitems)
+        if(list->index < list->nitems)
         {
             void* retv = list->buffer[list->index];
             list->index++;
