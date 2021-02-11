@@ -67,7 +67,7 @@ fart
 ***/1234
 smart
 
-'this is a squote too' ' more string here'
+'this is a squote too' + ' more string here' +
 ' >> this is more as well'
 
 

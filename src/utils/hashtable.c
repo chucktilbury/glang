@@ -13,7 +13,7 @@
  *
  */
 #include "common.h"
-#include "hashtable.h"
+
 
 #define TABLE_MAX_LOAD 0.75
 
@@ -65,7 +65,7 @@ static _table_entry_t* find_slot(_table_entry_t * ent, size_t cap, const char* k
     return (NULL);
 }
 
-/*
+/**
  * Grow the table if it needs it. Since the hash values change when the table
  * size changes, this function simply re-adds them to the new table, then
  * updates the data structure.

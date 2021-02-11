@@ -78,6 +78,8 @@ typedef enum {
     PRIVATE_TOKEN,
     PROTECTED_TOKEN,
     RETURN_TOKEN,
+    AS_TOKEN,
+    NAMESPACE_TOKEN,
 } token_t;
 
 #define TOK_TO_STR(t) \
@@ -153,6 +155,8 @@ typedef enum {
     ((t)==PRIVATE_TOKEN)? "'private'": \
     ((t)==PROTECTED_TOKEN)? "'protected'": \
     ((t)==RETURN_TOKEN)? "'return'": \
+    ((t)==AS_TOKEN)? "'as'": \
+    ((t)==NAMESPACE_TOKEN)? "'namespace'": \
     ((t)==INLINE_TOKEN)? "'inline'": "UNKNOWN")
 
 #include <stdint.h>

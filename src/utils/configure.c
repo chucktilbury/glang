@@ -12,15 +12,16 @@
 // TODO Only look at the parameter for the length of it, so that the value can be
 // concatenated to it.
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <errno.h>
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <string.h>
+//#include <ctype.h>
+//#include <errno.h>
 
-#include "configure.h"
-#include "memory.h"
+//#include "configure.h"
+//#include "memory.h"
 //#include "misc.h"
+#include "common.h"
 
 //static char cmd_line_buffer[1024*4];
 static char prog_name[1024];

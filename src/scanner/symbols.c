@@ -1,6 +1,5 @@
 #include "common.h"
 #include "scanner.h"
-#include "char_buffer.h"
 #include "local.h"
 
 // Read a word from the input and then find out if it's a keyword or a symbol.

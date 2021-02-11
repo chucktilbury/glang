@@ -31,6 +31,7 @@ int last_col;
 */
 token_map_t token_map[] = {
     {"and", AND_TOKEN},
+    {"as", AS_TOKEN},
     {"bool", BOOL_TOKEN},
     {"break", BREAK_TOKEN},
     {"case", CASE_TOKEN},
@@ -60,6 +61,7 @@ token_map_t token_map[] = {
     {"lte", LTE_TOKEN},
     {"lt", LT_TOKEN},
     {"map", MAP_TOKEN},
+    {"namespace", NAMESPACE_TOKEN},
     {"neq", NEQ_TOKEN},
     {"not", NOT_TOKEN},
     {"or", OR_TOKEN},

@@ -3,7 +3,7 @@
     added to it. It is intended to the transiant storage for strings.
 */
 #include "common.h"
-#include "char_buffer.h"
+
 
 typedef struct {
     size_t length;

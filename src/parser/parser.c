@@ -18,6 +18,15 @@ static const char* find_import(const char* fname) {
 }
 */
 
+// TODO: the parser now reads the symbols that  appear in classes from the
+// included file and skips things like function definitions. The symbols
+// that are read in are accessed with a dot.
+
+// TODO: Import names are not strings. They are symbols that will be used
+// to access the elements of the imported file.
+
+// TODO: Implement that 'as' keyword for imports.
+
 // Open a file for import. Only read the class definitions to acquire
 // the symbols and type information.
 static parse_state_t import_statement() {
@@ -25,7 +34,7 @@ static parse_state_t import_statement() {
     token_t tok = expect_tok(QSTRG_TOKEN);
     if(tok == QSTRG_TOKEN) {
         // fatal error when file cannot be opened
-        open_file(get_tok_str());
+        open_input_file(get_tok_str());
         //const char* tmp = get_tok_str();
         //const char* fname = find_import_file(tmp);
         //if(fname != NULL) {
@@ -81,12 +90,13 @@ int parse(const char* fname) {
     parse_state_t state = PARSE_TOP;
 
     if(fname != NULL) {
-        open_scanner_file(fname);
+        open_input_file(fname);
     }
     else
         command_error("no input file was specified");
 
     while(!finished) {
+        init_deco_str();
         tok = get_tok();
         switch(state) {
             case PARSE_TOP:
@@ -101,6 +111,7 @@ int parse(const char* fname) {
                         state = import_statement();
                         break;
                     case ERROR_TOKEN:
+                        init_deco_str(); // throw away the name, if any
                         state = PARSE_ERROR;
                         break;
                     case END_OF_INPUT:

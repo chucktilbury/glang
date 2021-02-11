@@ -1,6 +1,5 @@
 #include "common.h"
 #include "scanner.h"
-#include "char_buffer.h"
 #include "local.h"
 
 

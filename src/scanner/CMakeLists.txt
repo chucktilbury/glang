@@ -1,7 +1,7 @@
 project(scanner)
 
 add_library(${PROJECT_NAME} STATIC
-    scanner.c
+    common.c
     interface.c
     numbers.c
     strings.c

@@ -14,58 +14,61 @@ typedef enum {
 } symbol_error_t;
 
 typedef enum {
-    ASST_INT = 325,
-    ASST_UNT,
-    ASST_FLOAT,
-    ASST_BOOL,
-    ASST_STRING,
-    ASST_DICT,
-    ASST_MAP,
-    ASST_LIST,
-    ASST_CLASS,
+    // no assignment type is allowed
+    SYM_NO_TYPE = 325,
+    SYM_INT_TYPE,
+    SYM_UINT_TYPE,
+    SYM_FLOAT_TYPE,
+    SYM_BOOL_TYPE,
+    SYM_STRING_TYPE,
+    SYM_DICT_TYPE,
+    SYM_MAP_TYPE,
+    SYM_LIST_TYPE,
+    // These two are handled the same except that the SYM_INHERIT_TYPE
+    // type has a pointer to the symbol that the class inherited from
+    // in the value union. The SYM_CLASS_TYPE means that there is no
+    // base class.
+    SYM_CLASS_TYPE,
+    SYM_INHERIT_TYPE,
 } assignment_type_t;
 
 typedef enum {
-    NAMET_CLASS = 350,
-    NAMET_METHOD,
-    NAMET_VAR,
-    NAMET_CONST,
-    NAMET_IMPORT,
+    SYM_CLASS_TYPE = 350,
+    SYM_METHOD_TYPE,
+    SYM_VAR_TYPE,
+    SYM_CONST_TYPE,
+    SYM_IMPORT_TYPE,
+    // name is a system-wide serial number and is only accessed at the top of
+    // the symbol table stack.
+    SYM_ANON_TYPE,
 } name_type_t;
 
 typedef enum {
-    SCOT_PUBLIC = 375,
-    SCOT_PRIVATE,
-    SCOT_PROTECTED,
+    SYM_PUBLIC_TYPE = 375,
+    SYM_PRIVATE_TYPE,
+    SYM_PROTECTED_TYPE,
 } symbol_scope_t;
+
+typedef hashtable_t symbol_table_t;
 
 typedef struct _symbol_t {
     name_type_t name_type;
     assignment_type_t assign_type;
     symbol_scope_t scope;
+    symbol_table_t table;
     union {
         uint64_t uint_val;
         int64_t int_val;
         double float_val;
         char* str_val;
+        symbol_t* symbol;
     } const_val;
 } symbol_t;
 
+// defined in symbols.c
 void init_symbol_table();
-void init_deco_str();
-
-void deco_add_name(const char* name);
-void deco_add_type(const char* type);
-void deco_decapitate();
-const char* deco_extract_class(const char* name);
-const char* deco_extract_name(const char* name);
-token_t deco_extract_type(const char* name, int index);
-const char* deco_extract_type_str(const char* name, int index);
-
 symbol_error_t add_symbol();
 symbol_error_t update_symbol(const char*, symbol_t*);
 symbol_error_t get_symbol(const char* name, symbol_t* sym);
-
-const char* undecorate_name(const char* name);
 
 #endif

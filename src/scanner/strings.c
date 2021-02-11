@@ -1,6 +1,5 @@
 #include "common.h"
 #include "scanner.h"
-#include "char_buffer.h"
 #include "local.h"
 
 static void get_hex_escape() {
@@ -124,7 +123,6 @@ token_t read_dquote() {
                 get_string_esc();
                 break;
             case '\"':
-                //if(get_string_end('\"'))
                 finished++;
                 break;
             case '\n':
@@ -155,7 +153,6 @@ token_t read_squote() {
         ch = get_char();
         switch(ch) {
             case '\'':
-                //if(get_string_end('\''))
                 finished++;
                 break;
             case '\n':

@@ -44,7 +44,8 @@ static char* search_cmd_path(char* name) {
     char* buf = MALLOC(256);
 
     reset_config_list("FPATH");
-    for(ptr = iterate_config("FPATH"); ptr != NULL; ptr = iterate_config("FPATH")) {
+    for(ptr = iterate_config("FPATH"
+    ); ptr != NULL; ptr = iterate_config("FPATH")) {
         strcpy(buf, ptr);
         strcat(buf, "/");
         strcat(buf, name);
@@ -58,7 +59,7 @@ static char* search_cmd_path(char* name) {
 }
 
 //char* find_import_file(const char* base) {
-void open_file(const char* base) {
+void open_input_file(const char* base) {
 
     char* name;
     char* tmp = NULL;
@@ -66,13 +67,15 @@ void open_file(const char* base) {
     //memset(fn_buf, 0, sizeof(fn_buf));
 
     name = MALLOC(256);
-// TODO: detect unknown extentions and warn, but do not alter them.
+
     // add the file extention if it's not present
     strncpy(name, base, 252);
     tmp = strrchr(name, '.');
     if(tmp != NULL) {
-        if(strcmp(tmp, ".g"))
+        if(strcmp(tmp, ".g")) {
+            warning("unknown file extention: '%s'", tmp);
             strcat(name, ".g");
+        }
         else
             warning("do not include the file extention for import names");
     }

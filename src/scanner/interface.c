@@ -1,7 +1,6 @@
 
 #include "common.h"
 #include "scanner.h"
-#include "char_buffer.h"
 #include "local.h"
 
 // when this is entered, a (/) has been seen. If the next character is a
@@ -212,7 +211,6 @@ void open_scanner_file(const char* fname) {
     FILE* fp = fopen(fname, "r");
     if(fp == NULL) {
         fatal_error("Cannot open input file: \"%s\": %s", fname, strerror(errno));
-        exit(1);    // TODO: handle this error better than simply making it fatal.
     }
 
     file_stack_t* fstk = (file_stack_t*)CALLOC(1, sizeof(file_stack_t));

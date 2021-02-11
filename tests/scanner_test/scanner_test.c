@@ -1,7 +1,7 @@
 
 #include "common.h"
 #include "scanner.h"
-#include "files.h"
+
 
 BEGIN_CONFIG
     CONFIG_NUM("-v", "VERBOSE", "Set the verbosity from 0 to 50", 0, 0, 0)
@@ -23,13 +23,13 @@ int main(int argc, char** argv) {
     configure(argc, argv);
 
     for(char* str = iterate_config("INFILES"); str != NULL; str = iterate_config("INFILES")) {
-        open_file(str);
+        open_input_file(str);
         while(END_OF_INPUT != (tok = get_tok())) {
             print_line(tok);
             if(tok == IMPORT_TOKEN) {
                 tok = get_tok();
                 print_line(tok);
-                open_file(get_tok_str());
+                open_input_file(get_tok_str());
             }
         }
         print_line(tok);

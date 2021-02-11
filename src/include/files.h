@@ -2,6 +2,6 @@
 #define __FILES_H__
 
 int file_exists(char* fname);
-void open_file(const char* base);
+void open_input_file(const char* base);
 
 #endif

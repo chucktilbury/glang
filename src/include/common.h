@@ -8,8 +8,6 @@
 #include <string.h>
 #include <errno.h>
 
-#include "errors.h"
-#include "memory.h"
-#include "configure.h"
+#include "utils.h"
 
 #endif
